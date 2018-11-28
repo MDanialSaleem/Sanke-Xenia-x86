@@ -80,6 +80,8 @@ push ds
     cmp al, 0x48 ;w
     jne checkDownKey
 
+        cmp word[direction], 1 ;if going down then it can't go up.
+        je keysChecked
         mov word[direction], 3 ;for up
         jmp keysChecked
 
@@ -87,6 +89,8 @@ push ds
     cmp al, 0x50
     jne checkRightKey
 
+        cmp word[direction], 3 ;if going up, cannot go down.
+        je keysChecked
         mov word[direction], 1;for down
         jmp keysChecked
 
@@ -94,20 +98,27 @@ push ds
     cmp al, 0x4d
     jne checkLeftKey
 
-        mov word[direction], 0;for left
+        cmp word[direction], 2 ;if left,can't go right
+        je keysChecked
+        mov word[direction], 0;for right.
         jmp keysChecked
 
     checkLeftKey:
     cmp al, 0x4b
     jne checkEnter
 
-        mov word[direction], 2;for left
+        cmp word[direction], 0 ;if right, can't go left
+        je keysChecked
+        mov word[direction], 2;for left.
         jmp keysChecked
 
     checkEnter:
     cmp al, 0x1c
     jne keysChecked
+
         call elongateSnake
+
+
     keysChecked:
 
     mov al, 0x20
