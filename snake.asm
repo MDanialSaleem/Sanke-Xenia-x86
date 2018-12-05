@@ -1,6 +1,14 @@
 initializeSnake:
 ;meant to print the initial snake at the beginning of the game or if life is lost.
 pusha
+push es
+
+    push ds
+    pop es
+    mov di, snake ;es:di == start of snake.
+    mov ax, 0
+    mov cx, 240
+    rep stosw
 
     mov word[size], 20
     mov cx, 20
@@ -14,6 +22,8 @@ pusha
 
     loop whileInitialize
 
+    mov word[direction], 0
+pop es
 popa
 ret
 
@@ -117,8 +127,11 @@ push es
         pop es
         mov si, dx
         mov word[es:si], 0x0720
-        loopp:
-        jmp loopp
+        dec word[lives]
+        ; mov ah, 0
+        ; int 16h
+        call updateLives
+        call initializeSnake
 
     endCollisionCheck:
 pop es
@@ -331,9 +344,11 @@ push es
         mov es, ax
         mov bx, [snake]
         mov word[es:bx], 0x0720
-        infin:
-        jmp infin
-
+        dec word[lives]
+        ;mov ah, 0
+        ;int 16h
+        call updateLives
+        call initializeSnake
     noCollisionWithBoundary:
 pop es
 popa

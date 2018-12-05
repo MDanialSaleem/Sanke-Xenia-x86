@@ -9,10 +9,21 @@ snake: times 240 dw 0
 size: dw 0;curr size of the snake array.
 direction: dw 0;0 for right, 1 for down, 2 for left, 3 for up.
 foodGreen: dw 0 ;position of the fruit on screen.
+lives: dw 3
 
 %include "snake.asm"
 %include "food.asm"
 %include "utility.asm"
+
+updateLives:
+    cmp word[lives], 0
+    jne livesNotEnded
+
+        call clearScreen
+        death:
+        jmp death
+    livesNotEnded:
+ret
 
 
 zeroHandler:
@@ -105,19 +116,11 @@ push ds
 
     checkLeftKey:
     cmp al, 0x4b
-    jne checkEnter
+    jne keysChecked
 
         cmp word[direction], 0 ;if right, can't go left
         je keysChecked
         mov word[direction], 2;for left.
-        jmp keysChecked
-
-    checkEnter:
-    cmp al, 0x1c
-    jne keysChecked
-
-        call elongateSnake
-
 
     keysChecked:
 
@@ -126,6 +129,10 @@ push ds
 pop ds
 popa
 iret
+jmp far [cs:oldKbIsr]
+
+
+oldKbIsr: dd 0
 
 main:
 
@@ -137,9 +144,19 @@ call makeBoundary
 push word foodGreen
 call generateNewFood
 
+
+xor ax, ax
+mov es, ax
+
+mov ax, [es:0x9*4]
+mov [oldKbIsr], ax
+mov ax, [es:0x9*4 + 2]
+mov [oldKbIsr + 2], ax
+
 cli
 mov word[es:0], zeroHandler
 mov word[es:2], cs
+
 mov word[es:0x8*4], timer
 mov word[es:0x8*4 + 2], cs
 
