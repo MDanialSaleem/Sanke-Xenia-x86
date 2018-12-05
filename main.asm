@@ -10,6 +10,7 @@ size: dw 0;curr size of the snake array.
 direction: dw 0;0 for right, 1 for down, 2 for left, 3 for up.
 foodGreen: dw 0 ;position of the fruit on screen.
 lives: dw 3
+dead: dw 0
 
 %include "snake.asm"
 %include "food.asm"
@@ -20,8 +21,7 @@ updateLives:
     jne livesNotEnded
 
         call clearScreen
-        death:
-        jmp death
+
     livesNotEnded:
 ret
 
@@ -133,6 +133,8 @@ jmp far [cs:oldKbIsr]
 
 
 oldKbIsr: dd 0
+oldTimerIsr: dd 0
+oldZeroIsr: dd 0
 
 main:
 
@@ -153,6 +155,17 @@ mov [oldKbIsr], ax
 mov ax, [es:0x9*4 + 2]
 mov [oldKbIsr + 2], ax
 
+mov ax, [es:0x8*4]
+mov [oldTimerIsr], ax
+mov ax, [es:0x8*4 + 2]
+mov [oldTimerIsr + 2], ax
+
+mov ax, [es:0]
+mov [oldZeroIsr], ax
+mov ax, [es:2]
+mov [oldZeroIsr + 2], ax
+
+
 cli
 mov word[es:0], zeroHandler
 mov word[es:2], cs
@@ -163,6 +176,38 @@ mov word[es:0x8*4 + 2], cs
 mov word[es:0x9*4], kbisr
 mov word[es:0x9*4+ 2], cs
 sti
+
+
+lll:
+cmp word[dead], 1
+jne lll
+
+xor ax, ax
+mov es, ax
+
+cli
+
+
+mov ax, [oldKbIsr]
+mov [es:0x9*4], ax
+mov ax, [oldKbIsr + 2]
+mov [es:0x9*4 + 2], ax
+
+mov ax, [oldTimerIsr]
+mov [es:0x8*4], ax
+mov ax, [oldTimerIsr + 2]
+mov [es:0x8*4 + 2], ax
+
+mov ax, [oldZeroIsr]
+mov [es:0], ax
+mov ax, [oldZeroIsr + 2]
+mov [es:2], ax
+
+
+
+sti
+
+
 
 mov ax, 0x4c00
 int 21h

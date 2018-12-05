@@ -127,11 +127,13 @@ push es
         pop es
         mov si, dx
         mov word[es:si], 0x0720
-        dec word[lives]
-        ; mov ah, 0
-        ; int 16h
-        call updateLives
-        call initializeSnake
+        ; dec word[lives]
+        ; ; mov ah, 0
+        ; ; int 16h
+        ; call updateLives
+        ; call initializeSnake
+
+        mov word[dead], 1
 
     endCollisionCheck:
 pop es
@@ -340,15 +342,19 @@ push es
 
     collisionWithBoundary:
 
+        ; cmp word[lives], 0
+        ; je noCollisionWithBoundary
         mov ax, 0xb800
         mov es, ax
         mov bx, [snake]
         mov word[es:bx], 0x0720
-        dec word[lives]
-        ;mov ah, 0
-        ;int 16h
-        call updateLives
-        call initializeSnake
+        ; dec word[lives]
+        ; ;mov ah, 0
+        ; ;int 16h
+        ; call updateLives
+        ; call initializeSnake
+
+        mov word[dead], 1
     noCollisionWithBoundary:
 pop es
 popa
