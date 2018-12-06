@@ -10,24 +10,39 @@ size: dw 0;curr size of the snake array.
 direction: dw 0;0 for right, 1 for down, 2 for left, 3 for up.
 foodGreen: dw 0 ;position of the fruit on screen.
 lives: dw 3
-
 %include "snake.asm"
 %include "food.asm"
 %include "utility.asm"
 
+
+diplayLives:
+pusha
+push es
+
+    push word 0xb800
+    pop es
+    mov di, 158 ;top right corner of screen.
+    mov cx, [lives]
+    std 
+    mov ax, 0x0703
+    rep stosw
+
+
+pop es
+popa
+ret
 updateLives:
 push ax
-
+pushf
     cmp word[lives], 0
     je snakeAlreadyDed
 
         dec word[lives]
         call clearScreen
         call initializeSnake
-
+        
     snakeAlreadyDed:
-
-
+popf
 pop ax
 ret
 
@@ -58,6 +73,9 @@ push ds
     push cs 
     pop ds 
 
+    cmp word[lives], 0
+    je endTimerIsr
+
     cmp word[count], 1
     jne incrementTimer
 
@@ -69,7 +87,7 @@ push ds
         call eatFood
         call collisionCheckItself
         call collisionCheckBoundary
-        
+        call diplayLives
         mov word[count], 0
         jmp endTimerIsr
 
@@ -189,6 +207,14 @@ call clearScreen
 
 xor ax, ax
 mov es, ax
+
+
+mov ah, 0ch
+int 21h
+
+mov ah, 0
+int 16h ;waits for input.
+
 
 cli
 
