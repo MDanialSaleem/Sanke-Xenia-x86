@@ -66,6 +66,7 @@ push ds
         call collisionCheckItself
         call collisionCheckBoundary
         call diplayLives
+        call displayLength
         mov word[count], 0
         jmp endTimerIsr
 
@@ -145,7 +146,7 @@ call makeBoundary
 push word foodGreen
 call generateNewFood
 
-push word 0xffff
+push word 0x8888
 call updateTimerFrequency
 
 xor ax, ax

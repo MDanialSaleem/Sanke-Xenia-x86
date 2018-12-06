@@ -378,3 +378,10 @@ popf
 pop ax
 ret
 
+displayLength:
+
+    push word [size]
+    push word 80 ;somewhere in the middle of first row.
+    call printnum
+
+ret
