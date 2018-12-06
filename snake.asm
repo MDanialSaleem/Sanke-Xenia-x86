@@ -345,3 +345,36 @@ push es
 pop es
 popa
 ret
+
+diplayLives:
+pusha
+push es
+
+    push word 0xb800
+    pop es
+    mov di, 158 ;top right corner of screen.
+    mov cx, [lives]
+    std 
+    mov ax, 0x0703
+    rep stosw
+
+
+pop es
+popa
+ret
+
+updateLives:
+push ax
+pushf
+    cmp word[lives], 0
+    je snakeAlreadyDed
+
+        dec word[lives]
+        call clearScreen
+        call initializeSnake
+        
+    snakeAlreadyDed:
+popf
+pop ax
+ret
+
