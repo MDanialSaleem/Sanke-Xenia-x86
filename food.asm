@@ -24,7 +24,7 @@ pusha
     push word 0
     push word 0
     push ax
-    call calRowAndColumn
+    call calRowAndColumn ;gets the rows and column corresponding to the position of food on screen for easy comparison with boundary.
     pop ax ;col
     pop bx ;row
 
@@ -42,6 +42,22 @@ pusha
         mov dx, 1
     
     noFoodCollisionWithBoundary:
+
+
+    mov ax, [bp + 4] ;address of food.
+    cmp ax, [foodGreen]
+    jne foodNotCollidedWithGreenFood
+
+        mov dx, 1
+
+    foodNotCollidedWithGreenFood:
+
+    cmp ax, [bonusFood]
+    jne foodNotCollidedWithBonusFood
+
+        mov dx, 1
+
+    foodNotCollidedWithBonusFood:
     mov [bp + 6], dx
 
 popa
@@ -92,8 +108,13 @@ push es
 
     mov ax, 0xb800
     mov es, ax
+
     mov bx, [foodGreen]
     mov word[es:bx], 0x2720
+
+    mov bx, [bonusFood]
+    mov word[es:bx], 0x4720
+
 pop es
 popa
 ret
@@ -105,13 +126,66 @@ pusha
 
     mov ax, [snake] ;head
     cmp ax, [foodGreen] ;cmp head's position with fruit's position.
-    jne foodNotEaten
+    jne greenFoodNotEaten
 
         call elongateSnake
         push word foodGreen
         call generateNewFood
 
-    foodNotEaten:
+    greenFoodNotEaten:
+
+
+    cmp ax, [bonusFood]
+    jne bonusFoodNotEaten
+
+        call elongateSnake
+        call elongateSnake
+        call elongateSnake
+        call elongateSnake 
+        call elongateSnake ;to add 20 characters to the length.
+        mov word[bonusFood], 8000 ;to move it out of screen.
+        ;the strategy of normal food cannot be applied here because the bonus food generates after some time.
+    bonusFoodNotEaten:
+popa
+ret
+
+
+foodManager:
+;takes no parameters. It initialies the greenFood at the start of game. It also controls the appearence and disappearence
+;of bonus food.
+pusha
+
+    cmp word[foodGreen], 0
+    jne greenFoodAlreadyGenerated
+
+        push word foodGreen
+        call generateNewFood
+
+    greenFoodAlreadyGenerated:
+
+    mov ax, [seconds]
+    mov bl, 10
+    div bl
+
+    cmp ah, 0 ;for generating food every 10 seconds.
+    jne notTimeForBonusFood
+    cmp word[bonusFoodCountdown], 0
+    jg notTimeForBonusFood ;this means that the bonus food was already generated in the current second.
+    ; ;this prevents the bonus food from ebing regenerated multiple time in the 10th second.
+
+        push word bonusFood
+        call generateNewFood
+        mov word[bonusFoodCountdown], 5
+
+    notTimeForBonusFood:
+
+    cmp word[bonusFoodCountdown], 0
+    jg bonusFoodAvailable
+
+        mov word[bonusFood], 8000 ;a value outside of visible screen.
+        ;so that whenever time is up, the location of bonus food is outside of screen.
+    
+    bonusFoodAvailable:
 
 popa
 ret

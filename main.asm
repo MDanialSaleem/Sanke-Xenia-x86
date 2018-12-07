@@ -9,6 +9,8 @@ snake: times 240 dw 0
 size: dw 0;curr size of the snake array.
 direction: dw 0;0 for right, 1 for down, 2 for left, 3 for up.
 foodGreen: dw 0 ;position of the fruit on screen.
+bonusFood: dw 0
+bonusFoodCountdown: dw 0
 lives: dw 3
 int0frequency: dw 0 
 seconds: dw 0
@@ -63,6 +65,7 @@ push ds
         call moveSnake
         call makeSnake
         call eatFood
+        call foodManager
         call collisionCheckItself
         call collisionCheckBoundary
         call diplayLives
@@ -143,8 +146,7 @@ mov es, ax
 
 call initializeSnake
 call makeBoundary
-push word foodGreen
-call generateNewFood
+call foodManager
 
 push word 0x8888
 call updateTimerFrequency
