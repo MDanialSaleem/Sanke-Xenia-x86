@@ -120,7 +120,8 @@ push es
         minuteNotPassed:
 
         dec word[bonusFoodCountdown]
-        
+        dec word[bombFoodCountdown]
+
     secondNotPassed:
     call displayTime
 pop es

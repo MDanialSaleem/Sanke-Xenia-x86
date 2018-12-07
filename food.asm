@@ -1,6 +1,6 @@
 checkFoodCollisionWithSnakeAndBoundary:
 ;takes the position of food on video memory as input in stack, returns 1 if it matches with some position of snake or boundary
-;returns -1 otherwise.
+;or some other food. returns -1 otherwise.
 push bp
 mov bp, sp
 pusha
@@ -58,6 +58,14 @@ pusha
         mov dx, 1
 
     foodNotCollidedWithBonusFood:
+
+    cmp ax, [bombFood]
+    jne foodNotCollidedWithBombFood
+
+        mov dx, 1
+
+    foodNotCollidedWithBombFood:
+
     mov [bp + 6], dx
 
 popa
@@ -115,6 +123,9 @@ push es
     mov bx, [bonusFood]
     mov word[es:bx], 0x4720
 
+    mov bx, [bombFood]
+    mov word[es:bx], 0x1720
+
 pop es
 popa
 ret
@@ -146,6 +157,15 @@ pusha
         mov word[bonusFood], 8000 ;to move it out of screen.
         ;the strategy of normal food cannot be applied here because the bonus food generates after some time.
     bonusFoodNotEaten:
+
+
+    cmp ax, [bombFood]
+    jne bombFoodNotEaten
+
+        mov word[bombFood], 8000
+        call updateLives
+
+    bombFoodNotEaten:
 popa
 ret
 
@@ -171,7 +191,7 @@ pusha
     jne notTimeForBonusFood
     cmp word[bonusFoodCountdown], 0
     jg notTimeForBonusFood ;this means that the bonus food was already generated in the current second.
-    ; ;this prevents the bonus food from ebing regenerated multiple time in the 10th second.
+    ;this prevents the bonus food from ebing regenerated multiple time in the 10th second.
 
         push word bonusFood
         call generateNewFood
@@ -187,5 +207,30 @@ pusha
     
     bonusFoodAvailable:
 
+
+    cmp word[seconds], 10
+    jne notTimeForBombFood
+    cmp word[minutes], 0
+    je timeForBombFood 
+    cmp word[minutes], 3
+    jne notTimeForBombFood ;if(seconds == 30 && (minutes == 0 || minutes == 3))
+    timeForBombFood:
+
+        cmp word[bombFoodCountdown], 0
+        jg notTimeForBombFood ;see the logic for bonus food.
+
+            push word bombFood
+            call generateNewFood
+            mov word[bombFoodCountdown], 10
+
+    notTimeForBombFood:
+
+
+    cmp word[bombFoodCountdown], 0
+    jg bombFoodAvailable
+
+        mov word[bombFood], 8000 ;outside the screen.
+
+    bombFoodAvailable:
 popa
 ret

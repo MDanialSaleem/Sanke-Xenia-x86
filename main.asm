@@ -8,14 +8,20 @@ jmp main
 snake: times 240 dw 0
 size: dw 0;curr size of the snake array.
 direction: dw 0;0 for right, 1 for down, 2 for left, 3 for up.
+
 foodGreen: dw 0 ;position of the fruit on screen.
 bonusFood: dw 0
 bonusFoodCountdown: dw 0
+bombFood: dw 0
+bombFoodCountdown: dw 0
+
 lives: dw 3
+
 int0frequency: dw 0 
 seconds: dw 0
 minutes: dw 0
 tickCount: dw 0
+
 %include "snake.asm"
 %include "food.asm"
 %include "utility.asm"
