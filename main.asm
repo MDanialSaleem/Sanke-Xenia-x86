@@ -16,6 +16,7 @@ bombFood: dw 0
 bombFoodCountdown: dw 0
 
 lives: dw 3
+level: dw 0
 
 int0frequency: dw 0 
 seconds: dw 0
@@ -23,6 +24,7 @@ minutes: dw 0
 tickCount: dw 0
 
 %include "snake.asm"
+%include "arena.asm"
 %include "food.asm"
 %include "utility.asm"
 
