@@ -181,3 +181,70 @@ pop ax
 mov sp, bp
 pop bp
 ret 2
+
+winGameScreen:
+;does not take any paramter. prints the screen when game is won.
+push es
+
+    call clearScreen
+    push word 0xb800
+    pop es
+    mov word[es:1000], 0x4757
+
+
+pop es
+ret
+
+loseGameScreen:
+;does not take any paramter. prints the screen when game is lost.s
+push es
+
+    call clearScreen
+    push word 0xb800
+    pop es
+    mov word[es:1000], 0x474c
+
+
+pop es
+ret
+
+terminationCondition:
+;does not take any paramter and returns one value through stack. It return 1 if the game  was won, -1 if it was
+;was lost and 0 otherwise.
+;it checks both lives and 4 min time limit.
+push bp
+mov bp, sp
+pusha
+
+    mov ax, 0
+    cmp word[lives], 0
+    jne livesNotEnded
+
+        mov ax, -1
+        jmp endTerminationCondition
+
+    livesNotEnded:
+
+    cmp word[minutes], 4
+    jne timeNotPassed
+
+        cmp word[size], 240
+        jl gameLost
+
+            mov ax, 1
+            jmp endTerminationCondition
+
+        gameLost:
+
+            mov ax, -1
+
+    timeNotPassed:
+
+    endTerminationCondition:
+    mov [bp + 4], ax
+
+
+popa
+mov sp, bp
+pop bp
+ret

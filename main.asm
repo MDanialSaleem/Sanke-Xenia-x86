@@ -48,7 +48,6 @@ popa
 iret
 
 
-count: dw 0
 timer:
 pusha
 push ds
@@ -58,32 +57,20 @@ push ds
 
     
     inc word[tickCount]
-    cmp word[lives], 0
-    je endTimerIsr
 
-    cmp word[count], 1
-    jne incrementTimer
+    call clearScreen
+    call makeBoundary
+    call updateTime 
+    call drawFood
+    call moveSnake
+    call makeSnake
+    call eatFood
+    call foodManager
+    call collisionCheckItself
+    call collisionCheckBoundary
+    call diplayLives
+    call displayLength
 
-        call clearScreen
-        call makeBoundary
-        call updateTime 
-        call drawFood
-        call moveSnake
-        call makeSnake
-        call eatFood
-        call foodManager
-        call collisionCheckItself
-        call collisionCheckBoundary
-        call diplayLives
-        call displayLength
-        mov word[count], 0
-        jmp endTimerIsr
-
-    incrementTimer:
-    
-        inc word[count]
-
-    endTimerIsr:
     mov al, 0x20
     out 0x20, al
 
@@ -154,7 +141,7 @@ call initializeSnake
 call makeBoundary
 call foodManager
 
-push word 0x8888
+push word 0xffff
 call updateTimerFrequency
 
 xor ax, ax
@@ -189,20 +176,19 @@ sti
 
 
 notDead:
-cmp word[lives], 0
-jne notDead
+push word 0
+call terminationCondition
+pop dx
+cmp dx, 0
+je notDead
 
-call clearScreen
+
+
+
+
 
 xor ax, ax
 mov es, ax
-
-
-mov ah, 0ch
-int 21h
-
-mov ah, 0
-int 16h ;waits for input.
 
 
 cli
@@ -226,6 +212,23 @@ mov [es:2], ax
 
 
 sti
+
+cmp dx, 1
+jne loseCheck
+
+    call winGameScreen
+    jmp endGameCheck
+
+loseCheck:
+
+    call loseGameScreen
+
+endGameCheck:
+
+mov ah, 0ch
+int 21h
+mov ah, 0
+int 16h ;waits for input.
 
 
 
