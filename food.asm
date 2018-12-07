@@ -1,3 +1,4 @@
+
 checkFoodCollisionWithSnakeAndBoundary:
 ;takes the position of food on video memory as input in stack, returns 1 if it matches with some position of snake or boundary
 ;or some other food or some hurdle. returns -1 otherwise.
@@ -42,6 +43,20 @@ pusha
         mov dx, 1
     
     noFoodCollisionWithBoundary:
+
+    cmp word[level], 1
+    jne foodLevel1ChecksNotNecessary
+
+        push word 0
+        push word [bp + 4] ;the values received.
+        call generalCollisionWithLevel1Hurdles
+        pop si
+        cmp si, 0
+        je foodLevel1ChecksNotNecessary
+            mov dx, 1
+
+    foodLevel1ChecksNotNecessary:
+
 
     mov ax, [bp + 4] ;address of food.
     cmp ax, [foodGreen]

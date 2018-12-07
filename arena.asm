@@ -90,8 +90,8 @@ level1hurdle1: dw 0
 level1hurdle2: dw 0 
 level1hurdle1row: dw 5
 level1hurdle1col: dw 9
-level2hurdle2row: dw 19
-level2hurdle2col: dw 9  
+level1hurdle2row: dw 19
+level1hurdle2col: dw 9  
 
 initializeHurdlePositions:
 ;initalizes the values of hurdles and portals that are used by the functions of level 1 and level2. The reason for not hardcoding
@@ -106,8 +106,8 @@ push ax
     mov [level1hurdle1], ax
 
     push word 0 
-    push word [level2hurdle2row]
-    push word [level2hurdle2col]
+    push word [level1hurdle2row]
+    push word [level1hurdle2col]
     call calLocation
     pop ax ;address of 20th row 10th column.
     mov [level1hurdle2], ax
@@ -143,3 +143,49 @@ level2portalLE: dw 0
 level2portalLL: dw 0
 level2portalRE: dw 0
 level2portalRL: dw 0
+
+
+
+
+generalCollisionWithLevel1Hurdles:
+;takes an address on video memory in stack, and returns 1 if it collides with any of level1 hurdles.
+;returns 0 otherwise
+push bp 
+mov bp, sp
+push ax
+push bx
+
+    mov word[bp + 6], 0 ;return spot.
+
+    push word 0
+    push word 0
+    push word[bp + 4]
+    call calRowAndColumn ;gets the rows and column corresponding to the position of food on screen for easy comparison with boundary.
+    pop ax ;col
+    pop bx ;row
+
+    cmp bx, [level1hurdle1row]
+    jne generalCollisionL1H2Check
+    cmp ax, [level1hurdle1col]
+    jne generalCollisionL1H2Check
+
+        mov word[bp + 6], 1 ;in case it has collided with hurdle 1 of level 1.
+        jmp generalCollisionWithLevel1HurdlesEnd
+
+    generalCollisionL1H2Check:
+    
+    cmp bx, [level1hurdle2row]
+    jne generalCollisionWithLevel1HurdlesEnd
+    cmp ax, [level1hurdle2col]
+    jne generalCollisionWithLevel1HurdlesEnd
+
+        mov word[bp + 6], 1 ;collided with hurdle 2 of level 1
+
+    generalCollisionWithLevel1HurdlesEnd:
+
+            
+pop bx
+pop ax
+mov sp, bp
+pop bp
+ret 2
