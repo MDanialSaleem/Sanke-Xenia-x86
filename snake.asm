@@ -135,7 +135,6 @@ popa
 ret
 
 
-collCounter: dw 0
 
 collisionCheckMaster:
 push ax
@@ -157,6 +156,18 @@ push ax
 
     snakeCollisionWithLevel1NotNeeded:
     
+    cmp word[level], 2
+    jne snakeCollisionWithLevel2NotNeeded
+
+        push word 0
+        push word[snake] ;head
+        call generalCollisionWithLevel2Hurdles
+        pop ax
+        cmp ax, 1
+        jne snakeCollisionWithLevel2NotNeeded
+            call updateLives
+
+    snakeCollisionWithLevel2NotNeeded:
 pop ax
 ret
 

@@ -2,7 +2,15 @@ makeArena:
 ;takes no paramters and makes the arena of the game depending upon level.
 call makeBoundary
 call initializeHurdlePositions
-call makeHurdleLevel1
+cmp word[level], 1
+jne noDisplayLevel1Hurdles
+    call makeHurdleLevel1
+noDisplayLevel1Hurdles:
+
+cmp word[level], 2
+jne noDisplayLevel2Hurdles
+    call makeHurdleLevel2
+noDisplayLevel2Hurdles:
 
 ret
 
@@ -112,6 +120,13 @@ push ax
     pop ax ;address of 20th row 10th column.
     mov [level1hurdle2], ax
 
+    push word 0
+    push word[level2hurlderow]
+    push word[level2hurldecol]
+    call calLocation
+    pop ax
+    mov [level2hurdle], ax
+
 pop ax
 ret
 
@@ -139,12 +154,34 @@ popa
 ret
 
 level2hurdle: dw 0
+level2hurldecol: dw 39
+level2hurlderow: dw 0
+
 level2portalLE: dw 0
 level2portalLL: dw 0
 level2portalRE: dw 0
 level2portalRL: dw 0
 
+makeHurdleLevel2:
+pusha
+push es
 
+    push word 0xb800
+    pop es
+    mov bx, [level2hurdle]
+    mov cx, 25
+    mov ax, 0x3720
+
+    whilePrintingHurdleLevel2
+
+        mov word[es:bx], ax
+        add bx, 160
+
+    loop whilePrintingHurdleLevel2
+
+pop es
+popa
+ret
 
 
 generalCollisionWithLevel1Hurdles:
@@ -193,6 +230,35 @@ pusha
     generalCollisionWithLevel1HurdlesEnd:
 
             
+popa
+mov sp, bp
+pop bp
+ret 2
+
+
+generalCollisionWithLevel2Hurdles:
+;takes address of a memory as its input paramter. returns 1 if i collides with the center bar, 0 otherwise.
+push bp
+mov bp, sp
+pusha
+
+    mov word[bp + 6], 0 ;return spot.
+
+    push word 0
+    push word 0
+    push word[bp + 4]
+    call calRowAndColumn ;gets the rows and column corresponding to the position of food on screen for easy comparison with boundary.
+    pop ax ;col
+    pop bx ;row
+
+    cmp ax, [level2hurldecol]
+    jne generalCollisionWithLevel2HurdlesEnd
+
+        mov word[bp + 6], 1
+
+    generalCollisionWithLevel2HurdlesEnd:
+
+
 popa
 mov sp, bp
 pop bp

@@ -48,7 +48,7 @@ pusha
     jne foodLevel1ChecksNotNecessary
 
         push word 0
-        push word [bp + 4] ;the values received.
+        push word [bp + 4] ;the value received.
         call generalCollisionWithLevel1Hurdles
         pop si
         cmp si, 0
@@ -57,6 +57,20 @@ pusha
 
     foodLevel1ChecksNotNecessary:
 
+
+    cmp word[level], 2
+    jne foodLevel2ChecksNotNecessary
+
+        push word 0
+        push word [bp + 4] ;the value received.
+        call generalCollisionWithLevel2Hurdles
+        pop si
+        cmp si, 0
+        je foodLevel2ChecksNotNecessary
+            mov dx, 1
+
+
+    foodLevel2ChecksNotNecessary:
 
     mov ax, [bp + 4] ;address of food.
     cmp ax, [foodGreen]
