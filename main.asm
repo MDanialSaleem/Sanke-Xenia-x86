@@ -20,6 +20,10 @@ bombFoodCountdown: dw 0
 lives: dw 3
 level: dw 2
 
+portalLEColor: dw 0x724c
+portalLLColor: dw 0x744c
+portalREColor: dw 0x7252
+portalRLColor: dw 0x7452
 
 int0frequency: dw 0 
 seconds: dw 0

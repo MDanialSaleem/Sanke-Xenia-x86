@@ -127,6 +127,36 @@ push ax
     pop ax
     mov [level2hurdle], ax
 
+
+    push word 0
+    push word 1
+    push word 1 ;row 2 col 2
+    call calLocation
+    pop ax
+    mov [portalLE], ax
+
+    push word 0
+    push word 23
+    push word 1 ;row 24 col 2
+    call calLocation
+    pop ax
+    mov [portalLL], ax
+
+    push word 0
+    push word 1
+    push word 78 ;row 2 col 79
+    call calLocation
+    pop ax
+    mov [portalRE], ax
+
+    push word 0
+    push word 23
+    push word 78 ;row 24, col 79
+    call calLocation
+    pop ax
+    mov [portalRL], ax
+
+
 pop ax
 ret
 
@@ -157,10 +187,10 @@ level2hurdle: dw 0
 level2hurldecol: dw 39
 level2hurlderow: dw 0
 
-level2portalLE: dw 0
-level2portalLL: dw 0
-level2portalRE: dw 0
-level2portalRL: dw 0
+portalLE: dw 0
+portalLL: dw 0
+portalRE: dw 0
+portalRL: dw 0
 
 makeHurdleLevel2:
 pusha
@@ -178,6 +208,23 @@ push es
         add bx, 160
 
     loop whilePrintingHurdleLevel2
+
+
+    mov bx, [portalLE]
+    mov ax, [portalLEColor]
+    mov word[es:bx], ax
+
+    mov bx, [portalLL]
+    mov ax, [portalLLColor]
+    mov word[es:bx], ax
+
+    mov bx, [portalRE]
+    mov ax, [portalREColor]
+    mov word[es:bx], ax
+
+    mov bx, [portalRL]
+    mov ax, [portalRLColor]
+    mov word[es:bx], ax
 
 pop es
 popa
