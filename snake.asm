@@ -134,6 +134,32 @@ pop es
 popa
 ret
 
+
+collCounter: dw 0
+
+collisionCheckMaster:
+push ax
+
+    call collisionCheckItself
+    call collisionCheckBoundary
+
+
+    cmp word[level], 1
+    jne snakeCollisionWithLevel1NotNeeded
+
+        push word 0
+        push word[snake] ;pushes head.
+        call generalCollisionWithLevel1Hurdles
+        pop ax
+        cmp ax, 1
+        jne snakeCollisionWithLevel1NotNeeded
+            call updateLives
+
+    snakeCollisionWithLevel1NotNeeded:
+    
+pop ax
+ret
+
 elongateLeft:
 ;elongates the snake on left.
 pusha

@@ -71,8 +71,7 @@ push ds
     call makeSnake
     call eatFood
     call foodManager
-    call collisionCheckItself
-    call collisionCheckBoundary
+    call collisionCheckMaster
     call diplayLives
     call displayLength
 
@@ -136,6 +135,7 @@ jmp far [cs:oldKbIsr]
 oldKbIsr: dd 0
 oldTimerIsr: dd 0
 oldZeroIsr: dd 0
+
 
 main:
 

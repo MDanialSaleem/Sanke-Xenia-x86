@@ -152,8 +152,7 @@ generalCollisionWithLevel1Hurdles:
 ;returns 0 otherwise
 push bp 
 mov bp, sp
-push ax
-push bx
+pusha
 
     mov word[bp + 6], 0 ;return spot.
 
@@ -164,28 +163,37 @@ push bx
     pop ax ;col
     pop bx ;row
 
+    mov cx, [level1hurdle1col]
+    add cx, 59
+
     cmp bx, [level1hurdle1row]
     jne generalCollisionL1H2Check
     cmp ax, [level1hurdle1col]
-    jne generalCollisionL1H2Check
+    jl generalCollisionL1H2Check
+    cmp ax, cx
+    jg generalCollisionL1H2Check
 
         mov word[bp + 6], 1 ;in case it has collided with hurdle 1 of level 1.
         jmp generalCollisionWithLevel1HurdlesEnd
 
     generalCollisionL1H2Check:
     
+    mov cx, [level1hurdle1col]
+    add cx, 59
+
     cmp bx, [level1hurdle2row]
     jne generalCollisionWithLevel1HurdlesEnd
     cmp ax, [level1hurdle2col]
-    jne generalCollisionWithLevel1HurdlesEnd
+    jl generalCollisionWithLevel1HurdlesEnd
+    cmp ax, cx
+    jg generalCollisionWithLevel1HurdlesEnd
 
         mov word[bp + 6], 1 ;collided with hurdle 2 of level 1
 
     generalCollisionWithLevel1HurdlesEnd:
 
             
-pop bx
-pop ax
+popa
 mov sp, bp
 pop bp
 ret 2
