@@ -164,8 +164,18 @@ push ax
         call generalCollisionWithLevel2Hurdles
         pop ax
         cmp ax, 1
-        jne snakeCollisionWithLevel2NotNeeded
+        jne snakeCollisionWithPortalsCheck
             call updateLives
+
+        snakeCollisionWithPortalsCheck:
+        push word 0
+        push word[snake]
+        call generalCollisionWithPortals
+        pop ax
+        cmp ax, 0
+        je snakeCollisionWithLevel2NotNeeded
+            push ax
+            call handlePortals
 
     snakeCollisionWithLevel2NotNeeded:
 pop ax
@@ -308,6 +318,38 @@ ret
 
 
 
+handlePortals:
+;takes one paramter. the address of the portal on video memory.
+;it makes amends only for LL and RL portals. Collidision of snake with LE and RE is inconsequential.
+push bp
+mov bp, sp
+pusha
+
+    mov bx, [bp + 4]
+    cmp bx, [portalLL]
+    jne handleRL
+
+        mov di, [portalRE]
+        sub di, 2 ;snake enters at one step to the left of RE portal.
+        mov [snake], di ;moves head to new positon.
+        mov word[direction], 2 ;for moving to left.
+        jmp handlePortalsEnd
+
+    handleRL:
+    cmp bx, [portalRL]
+    jne handlePortalsEnd
+
+        mov di, [portalLE]
+        add di, 2 ;snake enters at one step to the right of LE portal
+        mov [snake], di
+        mov word[direction], 0 ;move left.
+
+    handlePortalsEnd:
+
+popa
+mov sp, bp
+pop bp
+ret 2
 
 diplayLives:
 pusha

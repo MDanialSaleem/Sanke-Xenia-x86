@@ -129,29 +129,29 @@ push ax
 
 
     push word 0
-    push word 1
-    push word 1 ;row 2 col 2
+    push word 4
+    push word 4 ;row 2 col 2
     call calLocation
     pop ax
     mov [portalLE], ax
 
     push word 0
-    push word 23
-    push word 1 ;row 24 col 2
+    push word 19
+    push word 4 ;row 24 col 2
     call calLocation
     pop ax
     mov [portalLL], ax
 
     push word 0
-    push word 1
-    push word 78 ;row 2 col 79
+    push word 4
+    push word 67 ;row 2 col 79
     call calLocation
     pop ax
     mov [portalRE], ax
 
     push word 0
-    push word 23
-    push word 78 ;row 24, col 79
+    push word 19
+    push word 67 ;row 24, col 79
     call calLocation
     pop ax
     mov [portalRL], ax
@@ -187,6 +187,7 @@ level2hurdle: dw 0
 level2hurldecol: dw 39
 level2hurlderow: dw 0
 
+portals: ;extra label for iteration. 
 portalLE: dw 0
 portalLL: dw 0
 portalRE: dw 0
@@ -305,6 +306,36 @@ pusha
 
     generalCollisionWithLevel2HurdlesEnd:
 
+
+popa
+mov sp, bp
+pop bp
+ret 2
+
+generalCollisionWithPortals:
+;takes an address on video memory as input. returns 0 if no collision with portal has occured otherwise returns the word present
+;at the portal with which it collided.
+push bp
+mov bp, sp
+pusha
+
+    mov word[bp + 6], 0 ;return value.
+
+    mov ax, [bp + 4] ;input address.
+    mov cx, 4
+    mov bx, portals
+
+    whileCheckingPortals:
+
+        cmp ax, [bx]
+        jne portalNotCollided
+
+            mov dx, [bx]
+            mov [bp + 6], dx
+
+        portalNotCollided:
+        add bx, 2
+    loop whileCheckingPortals
 
 popa
 mov sp, bp

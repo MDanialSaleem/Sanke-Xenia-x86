@@ -57,6 +57,7 @@ popa
 iret
 
 
+count: dw 0
 timer:
 pusha
 push ds
@@ -66,10 +67,14 @@ push ds
 
     
     inc word[tickCount]
+    call updateTime 
+
+    
+    cmp word[count], 2
+    jne endTimerIsr
 
     call clearScreen
     call makeArena
-    call updateTime 
     call drawFood
     call moveSnake
     call makeSnake
@@ -78,7 +83,11 @@ push ds
     call collisionCheckMaster
     call diplayLives
     call displayLength
-
+    
+    mov word[count], 0
+    
+    endTimerIsr:
+    inc word[count]
     mov al, 0x20
     out 0x20, al
 

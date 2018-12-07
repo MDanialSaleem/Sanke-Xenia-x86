@@ -66,9 +66,16 @@ pusha
         call generalCollisionWithLevel2Hurdles
         pop si
         cmp si, 0
+        je foodLevel2PortalChecks
+            mov dx, 1
+        foodLevel2PortalChecks:
+        push word 0
+        push word[bp + 4]
+        call generalCollisionWithPortals
+        pop si
+        cmp si, 0
         je foodLevel2ChecksNotNecessary
             mov dx, 1
-
 
     foodLevel2ChecksNotNecessary:
 
