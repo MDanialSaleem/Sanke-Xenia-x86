@@ -3,6 +3,8 @@
 jmp main
 
 
+;all global variables are declared here apart from those used by rand function in utility file and those used
+;by hurdle making function in arena file.
 
 ;each word of array is the position of that part of snake on screen.
 snake: times 240 dw 0
@@ -16,7 +18,8 @@ bombFood: dw 0
 bombFoodCountdown: dw 0
 
 lives: dw 3
-level: dw 0
+level: dw 1
+
 
 int0frequency: dw 0 
 seconds: dw 0
@@ -61,7 +64,7 @@ push ds
     inc word[tickCount]
 
     call clearScreen
-    call makeBoundary
+    call makeArena
     call updateTime 
     call drawFood
     call moveSnake
@@ -140,7 +143,7 @@ xor ax, ax
 mov es, ax
 
 call initializeSnake
-call makeBoundary
+call makeArena
 call foodManager
 
 push word 0xffff

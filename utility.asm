@@ -20,6 +20,25 @@ mov sp, bp
 pop bp
 ret 2
 
+
+calLocation:
+;takes row number as first paramter and column number as second paramter, returns the address of spot in video memory.
+;take note that using this function, rows and columns start from zero.
+push bp
+mov bp,sp
+pusha
+
+    mov ax, [bp + 6] ;row number (ypos)
+    mov bx, 80
+    mul bx
+    add ax, [bp + 4] ;add column number(xpos)
+    add ax, ax ;double it
+    mov [bp + 8], ax
+popa
+mov sp, bp
+pop bp
+ret 4
+
 clearScreen:
 pusha
 push es
