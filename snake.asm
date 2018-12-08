@@ -375,7 +375,8 @@ pushf
     je snakeAlreadyDed
 
         dec word[lives]
-        call clearScreen
+        call clearScreenWithoutBorder
+        call makeBoundary
         call initializeSnake
         
     snakeAlreadyDed:

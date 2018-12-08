@@ -1,6 +1,5 @@
 makeArena:
 ;takes no paramters and makes the arena of the game depending upon level.
-call makeBoundary
 call initializeHurdlePositions
 cmp word[level], 1
 jne noDisplayLevel1Hurdles

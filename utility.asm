@@ -57,6 +57,31 @@ pop es
 popa
 ret
 
+clearScreenWithoutBorder:
+pusha
+push es
+
+    push word 0xb800
+    pop es
+
+    mov ax, 0x0720
+
+    mov bx, 23 ;23 rows to clear.
+    mov si, 162 ;second row second column
+    whileClearing:
+
+        mov di, si ;es:di
+        mov cx, 78 ;78 columns to clear.
+        cld
+        rep stosw
+        add si, 160 ;move to next row.
+    dec bx
+    jnz whileClearing
+
+pop es
+popa
+ret
+
 seed: dw 158; 
 increment: dw 1939
 multiplier: dw 181

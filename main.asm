@@ -18,7 +18,7 @@ bombFood: dw 0
 bombFoodCountdown: dw 0
 
 lives: dw 3
-level: dw 2
+level: dw 0
 
 portalLEColor: dw 0x724c
 portalLLColor: dw 0x744c
@@ -69,11 +69,8 @@ push ds
     inc word[tickCount]
     call updateTime 
 
-    
-    cmp word[count], 2
-    jne endTimerIsr
 
-    call clearScreen
+    call clearScreenWithoutBorder
     call makeArena
     call drawFood
     call moveSnake
@@ -84,7 +81,6 @@ push ds
     call diplayLives
     call displayLength
     
-    mov word[count], 0
     
     endTimerIsr:
     inc word[count]
@@ -156,6 +152,7 @@ xor ax, ax
 mov es, ax
 
 call initializeSnake
+call makeBoundary
 call makeArena
 call foodManager
 
