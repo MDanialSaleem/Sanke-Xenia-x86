@@ -165,7 +165,11 @@ push es
             mov word[halfSeconds], 0
             inc word[seconds]
             dec word[bonusFoodCountdown]
-            dec word[bombFoodCountdown] ;decrement after one second.
+            dec word[bombFoodCountdown]
+            cmp word[resetMessageCountdown], 0
+            jle noResetMessageDecrement
+                dec word[resetMessageCountdown] ;decrement after one second.
+            noResetMessageDecrement:
 
             cmp word[seconds], 60
             jl minuteNotPassed
@@ -306,6 +310,7 @@ resetTime:
     mov word[seconds], 0
     mov word[minutes], 0
 
+    mov word[resetMessageCountdown], 2
 ret
 
 
@@ -320,3 +325,89 @@ checkTimePassed:
     timeNotPassed:
 
 ret
+
+
+resetMessage: db 'TIME RESET', 0
+
+displayResetMessage:
+push dx
+push ax
+    cmp word[resetMessageCountdown], 0
+    je resetMessageNotDisplayed
+
+        push word resetMessage
+        push word 0x00f0
+        push word 0
+        push word 6
+        call printStr
+
+
+    resetMessageNotDisplayed:
+pop ax
+pop dx
+ret
+
+
+stringLength:
+;takes address of null-terminated string as its only paramter and returns length in stack.
+push bp
+mov bp, sp
+pusha
+push es
+
+    mov cx, 0xFFFF
+    mov di, [bp + 4]
+    mov ax, ds
+    mov es, ax
+    mov al, 0
+    cld
+    repne scasb
+    mov dx, 0xFFFF
+    sub dx, cx
+    dec dx
+    mov [bp + 6], dx
+
+pop es
+popa
+mov sp, bp
+pop bp
+ret 2
+
+printStr:
+;takes 1-address of string, 2-attribute, 3-row, 4-col and prints to the screen.
+push bp
+mov bp, sp
+pusha
+push es
+
+    push word 0
+    push word [bp + 6] ;row
+    push word [bp + 4] ;col
+    call calLocation
+    pop di ;location
+
+    mov ax, 0xb800
+    mov es, ax
+
+    push word 0
+    push word [bp + 10]
+    call stringLength
+    pop cx
+
+    mov si, [bp + 10] ;source is at string at ds.
+
+    mov bx, [bp + 8]
+
+    mov ah, bl ;normal attribute.
+    whilePrinting:
+
+        lodsb
+        stosw
+
+    loop whilePrinting
+
+pop es
+popa
+mov sp, bp
+pop bp
+ret 8

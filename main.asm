@@ -31,6 +31,8 @@ hitSound: dw 772
 eatSound: dw 1569
 soundDuration: dw 2;in half seconds.
 
+resetMessageCountdown: dw 0
+
 int0frequency: dw 0 
 halfSeconds: dw 0
 seconds: dw 0
@@ -89,7 +91,7 @@ push ds
     call diplayLives
     call displayLength
     call displayTime
-    
+    call displayResetMessage
     
     endTimerIsr:
     inc word[count]
