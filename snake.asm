@@ -374,6 +374,10 @@ pushf
     cmp word[lives], 0
     je snakeAlreadyDed
 
+        push word [hitSound]
+        push word [soundDuration]
+        call generateGeneralSound
+
         dec word[lives]
         call clearScreenWithoutBorder
         call makeBoundary

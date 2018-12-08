@@ -178,11 +178,20 @@ pusha
         push word foodGreen
         call generateNewFood
 
+        push word [eatSound]
+        push word [soundDuration]
+        call generateGeneralSound
+
     greenFoodNotEaten:
 
 
     cmp ax, [bonusFood]
     jne bonusFoodNotEaten
+
+        
+        push word [eatSound]
+        push word [soundDuration]
+        call generateGeneralSound
 
         call elongateSnake
         call elongateSnake

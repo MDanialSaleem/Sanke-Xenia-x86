@@ -25,6 +25,12 @@ portalLLColor: dw 0x744c
 portalREColor: dw 0x7252
 portalRLColor: dw 0x7452
 
+
+
+hitSound: dw 772
+eatSound: dw 1569
+soundDuration: dw 2;in half seconds.
+
 int0frequency: dw 0 
 halfSeconds: dw 0
 seconds: dw 0
@@ -69,7 +75,7 @@ push ds
     
     inc word[tickCount]
     call updateTime 
-
+    call playMusic
 
     call clearScreenWithoutBorder
     call makeArena
