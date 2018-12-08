@@ -360,7 +360,12 @@ push es
     mov di, 158 ;top right corner of screen.
     mov cx, [lives]
     std 
-    mov ax, 0x0703
+    mov ax, 0x0403 ;red hearts.
+    rep stosw
+
+    mov cx, 3 ;uses di from where it was left off.
+    sub cx, [lives]
+    mov ax, 0x0703 ;white hearts.
     rep stosw
 
 

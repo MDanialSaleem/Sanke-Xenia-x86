@@ -39,6 +39,13 @@ seconds: dw 0
 minutes: dw 0
 tickCount: dw 0
 
+
+stage1Msg: db 'Press 1 for stage 1',0
+stage2Msg: db 'Press 2 for stage 2',0
+stage3Msg: db 'Press 3 for stage 3',0
+
+
+
 %include "snake.asm"
 %include "arena.asm"
 %include "food.asm"
@@ -158,7 +165,44 @@ oldTimerIsr: dd 0
 oldZeroIsr: dd 0
 
 
+printMessages:
+
+    push word stage1Msg
+    push word 0x0070
+    push word 10
+    push word 10
+    call printStr
+
+    push word stage2Msg
+    push word 0x0070
+    push word 11
+    push word 10
+    call printStr
+
+    push word stage3Msg
+    push word 0x0070
+    push word 12
+    push word 10
+    call printStr
+
+
+ret 
 main:
+
+
+call printMessages
+
+takeInputAgain:
+mov ah, 0
+int 16h
+sub al, 48
+dec al
+
+cmp al, 2
+ja takeInputAgain
+
+mov ah, 0
+mov [level], ax
 
 
 xor ax, ax
