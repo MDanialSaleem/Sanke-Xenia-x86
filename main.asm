@@ -85,8 +85,10 @@ push ds
     call eatFood
     call foodManager
     call collisionCheckMaster
+    call checkTimePassed
     call diplayLives
     call displayLength
+    call displayTime
     
     
     endTimerIsr:
@@ -148,6 +150,7 @@ popa
 jmp far [cs:oldKbIsr]
 
 
+
 oldKbIsr: dd 0
 oldTimerIsr: dd 0
 oldZeroIsr: dd 0
@@ -160,7 +163,6 @@ xor ax, ax
 mov es, ax
 
 call initializeSnake
-call makeBoundary
 call speakerOn
 call makeArena
 call foodManager

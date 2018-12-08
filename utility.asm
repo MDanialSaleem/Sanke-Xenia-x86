@@ -265,43 +265,58 @@ push es
 pop es
 ret
 
+
+
 terminationCondition:
 ;does not take any paramter and returns one value through stack. It return 1 if the game  was won, -1 if it was
 ;was lost and 0 otherwise.
-;it checks both lives and 4 min time limit.
+;it checks both lives and 240 size limit.
 push bp
 mov bp, sp
 pusha
 
-    mov ax, 0
+    mov word[bp + 4], 0
     cmp word[lives], 0
     jne livesNotEnded
 
-        mov ax, -1
-        jmp endTerminationCondition
+        mov word[bp + 4], -1
+        jmp sizeNotReached
 
     livesNotEnded:
 
-    cmp word[minutes], 4
-    jne timeNotPassed
+    cmp word[size], 120
+    jl sizeNotReached
 
-        cmp word[size], 240
-        jl gameLost
+        mov word[bp + 4], 1
 
-            mov ax, 1
-            jmp endTerminationCondition
+    sizeNotReached:
 
-        gameLost:
-
-            mov ax, -1
-
-    timeNotPassed:
-
-    endTerminationCondition:
-    mov [bp + 4], ax
 
 
 popa
 mov sp, bp
 pop bp
+ret
+
+
+resetTime:
+
+    mov word[tickCount], 0
+    mov word[halfSeconds], 0
+    mov word[seconds], 0
+    mov word[minutes], 0
+
+ret
+
+
+
+checkTimePassed:
+
+    cmp word[minutes], 1
+    jl timeNotPassed
+
+        call updateLives
+
+    timeNotPassed:
+
 ret

@@ -368,6 +368,7 @@ pop es
 popa
 ret
 
+
 updateLives:
 push ax
 pushf
@@ -379,7 +380,11 @@ pushf
         call generateGeneralSound
 
         dec word[lives]
-        call clearScreenWithoutBorder
+        call resetTime
+        call displayTime
+
+
+        call clearScreen
         call makeBoundary
         call initializeSnake
         
