@@ -153,22 +153,29 @@ push es
 
     mov ax, [int0frequency]
     cmp word[tickCount], ax
-    jl secondNotPassed
+    jl halfSecondNotPassed
 
         mov word[tickCount], 0
-        inc word[seconds]
-        cmp word[seconds], 60
-        jl minuteNotPassed
+        inc word[halfSeconds]
+        cmp word[halfSeconds], 2
+        jl secondNotPassed
+            mov word[halfSeconds], 0
+            inc word[seconds]
+            dec word[bonusFoodCountdown]
+            dec word[bombFoodCountdown] ;decrement after one second.
+            
+            cmp word[seconds], 60
+            jl minuteNotPassed
 
-            mov word[seconds], 0
-            inc word[minutes]
+                mov word[seconds], 0
+                inc word[minutes]
 
-        minuteNotPassed:
+            minuteNotPassed:
 
-        dec word[bonusFoodCountdown]
-        dec word[bombFoodCountdown]
 
-    secondNotPassed:
+        secondNotPassed:
+
+    halfSecondNotPassed:
     call displayTime
 pop es
 popa
@@ -214,10 +221,11 @@ push bx
     mov al, ah
     out 0x40, al
 
-    mov ax, 3752h
+    mov ax, 0x34dc
     mov dx, 12h
     mov bx, [bp + 4]
     div bx ;ax now has ticks/second.
+    shr ax, 1 ;ax/2 as now has ticks/half second.
     mov [int0frequency], ax
 
     sti

@@ -26,6 +26,7 @@ portalREColor: dw 0x7252
 portalRLColor: dw 0x7452
 
 int0frequency: dw 0 
+halfSeconds: dw 0
 seconds: dw 0
 minutes: dw 0
 tickCount: dw 0
