@@ -35,7 +35,7 @@ tickCount: dw 0
 %include "arena.asm"
 %include "food.asm"
 %include "utility.asm"
-
+%include "audio.asm"
 
 
 
@@ -149,11 +149,13 @@ oldZeroIsr: dd 0
 
 main:
 
+
 xor ax, ax
 mov es, ax
 
 call initializeSnake
 call makeBoundary
+call speakerOn
 call makeArena
 call foodManager
 
@@ -240,6 +242,8 @@ loseCheck:
     call loseGameScreen
 
 endGameCheck:
+
+call speakerOff
 
 mov ah, 0ch
 int 21h

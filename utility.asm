@@ -157,13 +157,16 @@ push es
 
         mov word[tickCount], 0
         inc word[halfSeconds]
+        
+        dec word[musicCountDown] ;decrement on every half second.
+
         cmp word[halfSeconds], 2
         jl secondNotPassed
             mov word[halfSeconds], 0
             inc word[seconds]
             dec word[bonusFoodCountdown]
             dec word[bombFoodCountdown] ;decrement after one second.
-            
+
             cmp word[seconds], 60
             jl minuteNotPassed
 
