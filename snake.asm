@@ -13,12 +13,27 @@ push es
     mov word[size], 20
     mov cx, 20
     mov bx, snake
-    mov ax, 560 ;randomly chosen.
+
+    mov ax, 560 
+    mov si, 2 
+
+    cmp word[level], 2
+    jne notInitializeLevel2
+    
+    push word 0
+    push word 20
+    push word 41
+    call calLocation
+    pop ax ;21st row, 42nd column.
+    mov si, 160 
+
+
+    notInitializeLevel2:
     whileInitialize:
 
         mov [bx], ax
         add bx, 2
-        sub ax, 2
+        sub ax, si
 
     loop whileInitialize
 
@@ -27,6 +42,8 @@ pop es
 popa
 ret
 
+snakeHeadCell: dw 0x3c02
+snakeBodyCell: dw 0x3c04
 makeSnake:
 pusha
 
@@ -37,12 +54,14 @@ pusha
     whileMakeSnake
 
         mov di, [bx]
-        mov word[es:di], 0x4820
+        mov ax, [snakeBodyCell]
+        mov word[es:di], ax
         add bx, 2
     loop whileMakeSnake
 
     mov bx, [snake]
-    mov word[es:bx], 0x1820
+    mov ax, [snakeHeadCell]
+    mov word[es:bx], ax
 popa
 ret
 
@@ -401,7 +420,7 @@ ret
 displayLength:
 
     push word [size]
-    push word 80 ;somewhere in the middle of first row.
+    push word 120 ;somewhere in the second half of first row.
     call printnum
 
 ret

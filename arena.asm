@@ -1,19 +1,50 @@
 makeArena:
 ;takes no paramters and makes the arena of the game depending upon level.
-call initializeHurdlePositions
-call makeBoundary
-cmp word[level], 1
-jne noDisplayLevel1Hurdles
-    call makeHurdleLevel1
-noDisplayLevel1Hurdles:
+    call initializeHurdlePositions
+    call makeBoundary
+    call makeSurface
+    cmp word[level], 1
+    jne noDisplayLevel1Hurdles
+        call makeHurdleLevel1
+    noDisplayLevel1Hurdles:
 
-cmp word[level], 2
-jne noDisplayLevel2Hurdles
-    call makeHurdleLevel2
-noDisplayLevel2Hurdles:
+    cmp word[level], 2
+    jne noDisplayLevel2Hurdles
+        call makeHurdleLevel2
+    noDisplayLevel2Hurdles:
 
 ret
 
+surfaceCell: dw 0x3700
+
+makeSurface:
+pusha
+push es
+
+    push word 0xb800
+    pop es
+
+    mov ax, [surfaceCell]
+
+    mov bx, 23 ;23 rows to clear.
+    mov si, 162 ;second row second column
+    whileSurfacing:
+
+        mov di, si ;es:di
+        mov cx, 78 ;78 columns to clear.
+        cld
+        rep stosw
+        add si, 160 ;move to next row.
+    dec bx
+    jnz whileSurfacing
+
+pop es
+popa
+ret
+
+
+boundaryUpDownCell: dw 0x04cd
+boundaryRightLeftCell: dw 0x04ba
 makeBoundary:
 ;creates the boundary around the snake
 pusha
@@ -24,7 +55,7 @@ push es
 
     ;draw upper boundary
     mov di, 0 ;es:di = b800: 0
-    mov ax, 0x1720 ;space with blue background.
+    mov ax, [boundaryUpDownCell]
     mov cx, 80
     rep stosw
 
@@ -33,6 +64,8 @@ push es
     mov cx, 80
     rep stosw
 
+    mov ax, [boundaryRightLeftCell]
+    
     ;draw left boundary
     mov bx, 0
     mov cx, 25
@@ -169,7 +202,7 @@ push es
     pop es
 
     cld 
-    mov ax, 0x6720 ;blank color.
+    mov ax, [boundaryUpDownCell] ;blank color.
 
     mov di, [level1hurdle1] ;es:di
     mov cx, 60
@@ -193,6 +226,11 @@ portalLL: dw 0
 portalRE: dw 0
 portalRL: dw 0
 
+
+
+portalEnterCell: dw 0x040a
+portalLeaveCell: dw 0x020a
+
 makeHurdleLevel2:
 pusha
 push es
@@ -201,7 +239,7 @@ push es
     pop es
     mov bx, [level2hurdle]
     mov cx, 25
-    mov ax, 0x3720
+    mov ax, [boundaryRightLeftCell]
 
     whilePrintingHurdleLevel2
 
@@ -212,19 +250,19 @@ push es
 
 
     mov bx, [portalLE]
-    mov ax, [portalLEColor]
+    mov ax, [portalEnterCell]
     mov word[es:bx], ax
 
     mov bx, [portalLL]
-    mov ax, [portalLLColor]
+    mov ax, [portalLeaveCell]
     mov word[es:bx], ax
 
     mov bx, [portalRE]
-    mov ax, [portalREColor]
+    mov ax, [portalEnterCell]
     mov word[es:bx], ax
 
     mov bx, [portalRL]
-    mov ax, [portalRLColor]
+    mov ax, [portalLeaveCell]
     mov word[es:bx], ax
 
 pop es

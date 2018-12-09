@@ -145,6 +145,10 @@ pop bp
 ret 2
 
 
+bombFoodCell: dw 0x780f
+greenFoodCell: dw 0x7e06
+bonusFoodCell: dw 0x7c15
+
 drawFood:
 pusha
 push es
@@ -153,13 +157,16 @@ push es
     mov es, ax
 
     mov bx, [foodGreen]
-    mov word[es:bx], 0x2720
+    mov dx, [greenFoodCell]
+    mov word[es:bx], dx
 
     mov bx, [bonusFood]
-    mov word[es:bx], 0x4720
+    mov dx, [bonusFoodCell]
+    mov word[es:bx], dx
 
     mov bx, [bombFood]
-    mov word[es:bx], 0x1720
+    mov dx, [bombFoodCell]
+    mov word[es:bx], dx
 
 pop es
 popa

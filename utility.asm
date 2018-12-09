@@ -57,30 +57,7 @@ pop es
 popa
 ret
 
-clearScreenWithoutBorder:
-pusha
-push es
 
-    push word 0xb800
-    pop es
-
-    mov ax, 0x0720
-
-    mov bx, 23 ;23 rows to clear.
-    mov si, 162 ;second row second column
-    whileClearing:
-
-        mov di, si ;es:di
-        mov cx, 78 ;78 columns to clear.
-        cld
-        rep stosw
-        add si, 160 ;move to next row.
-    dec bx
-    jnz whileClearing
-
-pop es
-popa
-ret
 
 seed: dw 158; 
 increment: dw 1939
@@ -245,7 +222,7 @@ mov sp, bp
 pop bp
 ret 2
 
-winGameMsg: db 'YOU WIN', 0
+winGameMsg: db 'YOU WIN. Press enter to continue', 0
 pointMsg: db 'Points:', 0
 bonusLifeMsg: db 'Skill Bonus:', 0
 bonusTimeMsg: db 'Speed Bonus:', 0
@@ -258,7 +235,7 @@ pusha
     call clearScreen
     
     push word winGameMsg
-    push word 0x0047
+    push word 0x00cf
     push word 8
     push word 18
     call printStr
@@ -328,14 +305,14 @@ pusha
 popa
 ret
 
-loseGameMsg: db 'YOU LOSE', 0
+loseGameMsg: db 'YOU LOSE. Press Enter to continue', 0
 loseGameScreen:
 ;does not take any paramter. prints the screen when game is lost.s
 push es
 
     call clearScreen
     push word loseGameMsg
-    push word 0x0047
+    push word 0x00cf
     push word 10
     push word 10
     call printStr

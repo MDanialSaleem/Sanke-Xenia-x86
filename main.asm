@@ -3,13 +3,11 @@
 jmp main
 
 
-;all global variables are declared here apart from those used by rand function in utility file and those used
-;by hurdle making function in arena file.
 
 ;each word of array is the position of that part of snake on screen.
 snake: times 240 dw 0
-size: dw 0;curr size of the snake array.
-direction: dw 0;0 for right, 1 for down, 2 for left, 3 for up.
+size: dw 0			;curr size of the snake array.
+direction: dw 0     ;0 for right, 1 for down, 2 for left, 3 for up.
 
 foodGreen: dw 0 ;position of the fruit on screen.
 bonusFood: dw 0
@@ -20,14 +18,8 @@ bombFoodCountdown: dw 0
 lives: dw 3
 level: dw 0
 
-portalLEColor: dw 0x724c
-portalLLColor: dw 0x744c
-portalREColor: dw 0x7252
-portalRLColor: dw 0x7452
 
-
-
-hitSound: dw 772
+hitSound: dw 4536
 eatSound: dw 1569
 soundDuration: dw 2;in half seconds.
 
@@ -45,6 +37,8 @@ delayCount: dw 4 ;initially starts with 4 second delay at the slowest possible f
 currCount: dw 0 ;the purpose is almost same as tickCount defined above, but that variable is used for maintaining time and music.
 controlWord: dw 0
 
+
+WelcomeMsg: db 'Welcoe to Snake Xenia', 0
 stage1Msg: db 'Press 1 for stage 1',0
 stage2Msg: db 'Press 2 for stage 2',0
 stage3Msg: db 'Press 3 for stage 3',0
@@ -61,7 +55,7 @@ stage3Msg: db 'Press 3 for stage 3',0
 
 
 zeroHandler:
-;just to make the screen red if some collision occurs.
+;just to make the screen red if some div by zero occurs.
 pusha
 push es
 
@@ -91,13 +85,12 @@ push ds
 
     call updateTime 
     call playMusic
-    call updateSpeed ;these functions maintain the system.
+    call updateSpeed 		  ;these functions maintain the system.
 
-    mov ax, [delayCount]
+    mov ax, [delayCount]	;controls the speed.
     cmp [currCount], ax
     jl endTimerIsr
 
-        call clearScreenWithoutBorder
         call makeArena
         call drawFood
         call moveSnake
@@ -111,7 +104,7 @@ push ds
     endTimerIsr:
 
 
-    call diplayLives ;actually only displayTime needs to be outputted on every tick, this is just to group related logic.
+    call diplayLives 		;actually only displayTime needs to be outputted on every tick, this is just to group related logic.
     call displayLength
     call displayTime
     call displayResetMessage
@@ -181,29 +174,36 @@ oldZeroIsr: dd 0
 
 printMessages:
 
+    push word WelcomeMsg
+    push word 0x00c0
+    push word 8
+    push word 10
+    call printStr
+
     push word stage1Msg
-    push word 0x0070
+    push word 0x0040
     push word 10
     push word 10
     call printStr
 
     push word stage2Msg
-    push word 0x0070
+    push word 0x0040
     push word 11
     push word 10
     call printStr
 
     push word stage3Msg
-    push word 0x0070
+    push word 0x0040
     push word 12
     push word 10
     call printStr
 
 
 ret 
+
 main:
 
-
+call clearScreen
 call printMessages
 
 takeInputAgain:
@@ -318,6 +318,7 @@ int 21h
 mov ah, 0
 int 16h ;waits for input.
 
+call clearScreen
 
 
 mov ax, 0x4c00
