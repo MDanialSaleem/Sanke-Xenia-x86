@@ -166,7 +166,6 @@ push es
             inc word[seconds]
             dec word[bonusFoodCountdown]
             dec word[bombFoodCountdown]
-            mov word[controlWord], 0
 
             cmp word[resetMessageCountdown], 0
             jle noResetMessageDecrement
@@ -178,6 +177,7 @@ push es
 
                 mov word[seconds], 0
                 inc word[minutes]
+                mov word[controlWord], 0
 
             minuteNotPassed:
 
@@ -245,27 +245,100 @@ mov sp, bp
 pop bp
 ret 2
 
+winGameMsg: db 'YOU WIN', 0
+pointMsg: db 'Points:', 0
+bonusLifeMsg: db 'Skill Bonus:', 0
+bonusTimeMsg: db 'Speed Bonus:', 0
+totalMsg: db 'Grand Total:', 0 ;description in the function underneath.
+
 winGameScreen:
 ;does not take any paramter. prints the screen when game is won.
-push es
+pusha
 
     call clearScreen
-    push word 0xb800
-    pop es
-    mov word[es:1000], 0x4757
+    
+    push word winGameMsg
+    push word 0x0047
+    push word 8
+    push word 18
+    call printStr
+
+    push word pointMsg
+    push word 0x0047
+    push word 10
+    push word 10
+    call printStr
+
+    push word bonusLifeMsg
+    push word 0x0047
+    push word 11
+    push word 10
+    call printStr
+
+    push word bonusTimeMsg
+    push word 0x0047
+    push word 12
+    push word 10
+    call printStr
+
+    push word totalMsg
+    push word 0x0047
+    push word 13
+    push word 10
+    call printStr
+
+    push word 0
+    push word 10
+    push word 25
+    call calLocation
+    pop ax
+
+    push word[size] ;normal points are just the length of snake. some number >= 240.
+    push word ax
+    call printnum
+
+    add ax, 160
+    mov bx, [lives]
+    shl bx, 4 ;multiply by 16
+    push bx ;skill points = number of lives reamining * 16
+    push ax
+    call printnum
+
+    add ax, 160
+    mov cx, 4
+    sub cx, [minutes]
+    shl cx, 6 ;mutiply by 64. basically converting to seconds with less accuracy which is not required.
+    mov si, 60
+    sub si, [seconds]
+    add cx, si
+    push cx ;minutesRemaining * 64 + seconds reamining.
+    push ax
+    call printnum
+
+    add ax, 160
+    mov dx, 0
+    add dx, [size]
+    add dx, bx
+    add dx, cx 
+    push dx ;total = all added up.
+    push ax
+    call printnum
 
 
-pop es
+popa
 ret
 
+loseGameMsg: db 'YOU LOSE', 0
 loseGameScreen:
 ;does not take any paramter. prints the screen when game is lost.s
 push es
 
     call clearScreen
-    push word 0xb800
-    pop es
-    mov word[es:1000], 0x474c
+    push word loseGameMsg
+    push word 0x0047
+    push word 10
+    push word 10
+    call printStr
 
 
 pop es
