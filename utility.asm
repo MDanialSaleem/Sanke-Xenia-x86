@@ -166,6 +166,8 @@ push es
             inc word[seconds]
             dec word[bonusFoodCountdown]
             dec word[bombFoodCountdown]
+            mov word[controlWord], 0
+
             cmp word[resetMessageCountdown], 0
             jle noResetMessageDecrement
                 dec word[resetMessageCountdown] ;decrement after one second.
@@ -288,7 +290,7 @@ pusha
 
     livesNotEnded:
 
-    cmp word[size], 120
+    cmp word[size], 240
     jl sizeNotReached
 
         mov word[bp + 4], 1
@@ -317,7 +319,7 @@ ret
 
 checkTimePassed:
 
-    cmp word[minutes], 1
+    cmp word[minutes], 4
     jl timeNotPassed
 
         call updateLives
@@ -411,3 +413,59 @@ popa
 mov sp, bp
 pop bp
 ret 8
+
+
+
+updateSpeed:
+pusha
+
+    cmp word[controlWord], 1
+    je updateSpeedNo
+
+    cmp word[minutes], 1
+    je updateSpeedYes
+    cmp word[minutes], 2
+    je updateSpeedYes
+    cmp word[minutes], 3
+    jne updateSpeedNo ;if(minute == 1 || minute == 2 || minute == 3)
+
+
+    updateSpeedYes:
+
+        cmp word[delayCount], 0
+        je halveFrequency
+
+            ;this means we can still increase speed by halving the delay count.
+            shr word[delayCount], 1
+            mov word[currCount], 0
+            mov word[controlWord], 1
+
+            cmp word[delayCount], 1
+            jne updateSpeedNo
+                mov word[delayCount], 0 ;4->2->0
+            jmp updateSpeedNo
+
+        halveFrequency:
+            mov word[controlWord], 1
+            mov ax, [int0divisor] 
+            shr ax, 1 
+            mov [int0divisor], ax
+
+            push ax
+            call updateTimerFrequency
+
+    updateSpeedNo:
+
+popa
+ret
+
+
+resetSpeed:
+
+    mov word[delayCount], 4
+    mov word[int0divisor], 0xffff
+    push word[int0divisor]
+    call updateTimerFrequency
+
+
+ret

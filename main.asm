@@ -33,12 +33,17 @@ soundDuration: dw 2;in half seconds.
 
 resetMessageCountdown: dw 0
 
+int0divisor: dw 0xffff ;initial divisor.
 int0frequency: dw 0 
 halfSeconds: dw 0
 seconds: dw 0
 minutes: dw 0
 tickCount: dw 0
 
+
+delayCount: dw 4 ;initially starts with 4 second delay at the slowest possible frequency of 18.2.
+currCount: dw 0 ;the purpose is almost same as tickCount defined above, but that variable is used for maintaining time and music.
+controlWord: dw 0
 
 stage1Msg: db 'Press 1 for stage 1',0
 stage2Msg: db 'Press 2 for stage 2',0
@@ -73,7 +78,6 @@ popa
 iret
 
 
-count: dw 0
 timer:
 pusha
 push ds
@@ -83,25 +87,35 @@ push ds
 
     
     inc word[tickCount]
+    inc word[currCount]
+
     call updateTime 
     call playMusic
+    call updateSpeed ;these functions maintain the system.
 
-    call clearScreenWithoutBorder
-    call makeArena
-    call drawFood
-    call moveSnake
-    call makeSnake
-    call eatFood
-    call foodManager
-    call collisionCheckMaster
-    call checkTimePassed
-    call diplayLives
+    mov ax, [delayCount]
+    cmp [currCount], ax
+    jl endTimerIsr
+
+        call clearScreenWithoutBorder
+        call makeArena
+        call drawFood
+        call moveSnake
+        call makeSnake
+        call eatFood
+        call foodManager
+        call collisionCheckMaster
+        call checkTimePassed
+
+        mov word[currCount], 0
+    endTimerIsr:
+
+
+    call diplayLives ;actually only displayTime needs to be outputted on every tick, this is just to group related logic.
     call displayLength
     call displayTime
     call displayResetMessage
-    
-    endTimerIsr:
-    inc word[count]
+
     mov al, 0x20
     out 0x20, al
 
@@ -213,7 +227,7 @@ call speakerOn
 call makeArena
 call foodManager
 
-push word 0xffff
+push word [int0divisor]
 call updateTimerFrequency
 
 xor ax, ax

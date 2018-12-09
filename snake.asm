@@ -386,8 +386,8 @@ pushf
 
         dec word[lives]
         call resetTime
+        call resetSpeed
         call displayTime
-
 
         call clearScreen
         call makeBoundary
