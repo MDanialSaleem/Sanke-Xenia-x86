@@ -42,6 +42,12 @@ WelcomeMsg: db 'Welcoe to Snake Xenia', 0
 stage1Msg: db 'Press 1 for stage 1',0
 stage2Msg: db 'Press 2 for stage 2',0
 stage3Msg: db 'Press 3 for stage 3',0
+instruct0: db 'INSTRUCTIONS', 0
+instruct01: db 'You have three lives. Eating food increases points and length', 0
+instruct1: db 'You lose life if you hit walls, yourself, or eat the black food', 0
+instruct2: db 'Yellow food gives you 4 points.', 0
+instruct3: db 'Pink food gives you 20 points, and appears for a temporary time', 0
+instruct4: db 'In stage 3, green portal on one side leads to the red one on the other side.', 0
 
 
 
@@ -196,6 +202,42 @@ printMessages:
     push word 0x0040
     push word 12
     push word 10
+    call printStr
+
+    push word instruct0
+    push word 0x0040
+    push word 14
+    push word 2
+    call printStr
+
+    push word instruct01
+    push word 0x0040
+    push word 15
+    push word 2
+    call printStr
+
+    push word instruct1
+    push word 0x0040
+    push word 16
+    push word 2
+    call printStr
+
+    push word instruct2
+    push word 0x0040
+    push word 17
+    push word 2
+    call printStr
+
+    push word instruct3
+    push word 0x0040
+    push word 18
+    push word 2
+    call printStr
+
+    push word instruct4
+    push word 0x0040
+    push word 19
+    push word 2
     call printStr
 
 
